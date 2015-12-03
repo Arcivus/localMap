@@ -1,54 +1,34 @@
 var ViewModel = function(){
 	var self = this;
+	var map;
+	var myOptions = {
+    	zoom: 17,
+    	center: new google.maps.LatLng(59.957369, 30.307766),
+    	mapTypeId: 'roadmap'
+	};
+	map = new google.maps.Map($('#mapDiv')[0], myOptions);
 
-	self.localMap = ko.observable({
-		lat : ko.observable(59.957369),
-		lng : ko.observable(30.307766)
+	var getPlace = function(lat, lng) {
+    return new google.maps.LatLng(lat, lng);
+	};
+	this.name = ko.observable("Johnny");
+	this.information = ko.observable("Hello there");
+
+	var addMarker = google.maps.event.addListener(map, 'dblclick', function(e){
+		var lat = e.latLng.lat();
+		var lng = e.latLng.lng();
+		var marker = new google.maps.Marker({
+			position : getPlace(lat, lng),
+			map : map,
+			title : self.name(),
+			draggable : true
+		});
 	});
+
+
 };
 
 
-
-
-ko.bindingHandlers.map = {
-
-	init : function(element, valueAccessor, allBindingsAccessor) {
-		var	mapObj = ko.utils.unwrapObservable(valueAccessor());
-		var latLng = new google.maps.LatLng(
-			ko.utils.unwrapObservable(mapObj.lat),
-			ko.utils.unwrapObservable(mapObj.lng));
-		var mapOptions = {
-			 center : latLng,
-			 zoom : 17,
-			 mapTypeId : google.maps.MapTypeId.ROADMAP
-		};
-
-		mapObj.googleMap = new google.maps.Map(element, mapOptions);
-
-		mapObj.addMarker = google.maps.event.addListener(mapObj.googleMap, 'dblclick', function(e){
-			var lat = e.latLng.lat();
-			var lng = e.latLng.lng();
-			var marker = new google.maps.Marker({
-				position : new google.maps.LatLng(lat, lng),
-				map : mapObj.googleMap,
-				dragable : true,
-				title : "message here",
-			});
-
-			var infowindow = new google.maps.InfoWindow({
-				content : "Here's Johnny!!!"
-			});
-
-			marker.addListener('click', function(){
-				infowindow.open(mapObj.googleMap, marker);
-			});
-
-
-
-			event.preventDefault();
-    });  
-	}
-};
 
 ko.applyBindings(new ViewModel());
 
