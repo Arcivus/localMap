@@ -12,6 +12,8 @@ ko.bindingHandlers.editableText = {
     }
 };
 
+markers = [];
+
 var ViewModel = function(){
 	var self = this;
 	var map;
@@ -30,6 +32,8 @@ var ViewModel = function(){
 
 
 
+
+
 	var addMarker = google.maps.event.addListener(map, 'dblclick', function(e){
 		var lat = e.latLng.lat();
 		var lng = e.latLng.lng();
@@ -41,6 +45,7 @@ var ViewModel = function(){
 			id : lat + " " + lng,
 
 		});
+		markers.push(marker);
 		self.names.push(marker);
 		bindMarkerEvents(marker);
 
@@ -50,22 +55,20 @@ var ViewModel = function(){
 	var bindMarkerEvents = function(marker){
 		//Change marker title
 		google.maps.event.addListener(marker, 'dblclick', function(point){
-			var markerId = point.latLng.lat() + " " + point.latLng.lng();
+			var clickedMarkerId = point.latLng.lat() + " " + point.latLng.lng();
 
 			var markerNewTitle = window.prompt("Новое название:", marker.title);
 			if(markerNewTitle != marker.title && markerNewTitle != null){
 
 				marker.setTitle(markerNewTitle);
 
-				self.names().forEach(function(oldInfo, i){
-					if(oldInfo.id == markerId){
+				self.names().forEach(function(oldInfo){
+					if(oldInfo.id == clickedMarkerId){
 
 						self.names.replace(oldInfo, 
-						{title : markerNewTitle, id : markerId, description : oldInfo.description});
+						{title : markerNewTitle, id : clickedMarkerId, description : oldInfo.description});
 
-						//send clicked marker info to the top of the list
-						var makeFirst = self.names.splice(i, 1);
-						self.names.unshift(makeFirst[0]);
+
 
 					}; 
 				});
@@ -73,19 +76,37 @@ var ViewModel = function(){
 		});
 		//Remove marker
 		google.maps.event.addListener(marker, 'rightclick', function(point){
-			var markerId = point.latLng.lat() + " " + point.latLng.lng();
-			console.log(marker.description());
+			var clickedMarkerId = point.latLng.lat() + " " + point.latLng.lng();
 			self.names().forEach(function(markerInfo){
-				if(markerInfo.id == markerId){
+				if(markerInfo.id == clickedMarkerId){
+
 					if(confirm("Remove marker " + markerInfo.title + "?")){
 
-						self.names.remove(function (item){return item.id == markerId});
+						self.names.remove(function (item){return item.id == clickedMarkerId});
 						marker.setMap(null);
 
 					};
 				};
 
 			});
+		});
+		//Highlight marker
+		google.maps.event.addListener(marker, 'click', function(point){
+			var clickedMarkerId = point.latLng.lat() + " " + point.latLng.lng();
+			self.names().forEach(function(markerInfo, i){
+				if(markerInfo.id == clickedMarkerId){
+					//send clicked marker info to the top of the list
+					var makeFirst = self.names.splice(i, 1);
+					self.names.unshift(makeFirst[0]);
+				};
+			});
+			//set special icon for clicked marker
+			markers.forEach(function(marker, i){
+				marker.setIcon('http://mt.googleapis.com/vt/icon/name=icons/spotlight/spotlight-poi.png');
+				if(marker.id == clickedMarkerId){
+					marker.setIcon('http://maps.google.com/mapfiles/marker_green.png');
+				}
+			})
 		});
 	};
 
