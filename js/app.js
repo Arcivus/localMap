@@ -11,8 +11,10 @@ var ViewModel = function(){
 	var getPlace = function(lat, lng) {
     return new google.maps.LatLng(lat, lng);
 	};
-	this.name = ko.observable("Johnny");
-	this.information = ko.observable("Hello there");
+	
+	this.names = ko.observableArray([]);
+
+
 
 	var addMarker = google.maps.event.addListener(map, 'dblclick', function(e){
 		var lat = e.latLng.lat();
@@ -20,11 +22,49 @@ var ViewModel = function(){
 		var marker = new google.maps.Marker({
 			position : getPlace(lat, lng),
 			map : map,
-			title : self.name(),
-			draggable : true
-		});
-	});
+			title : "Title",
+			description : "description goes here...",
+			id : lat + " " + lng,
 
+		});
+		self.names.push(marker);
+		bindMarkerEvents(marker);
+
+		event.preventDefault();
+	});
+	
+	var bindMarkerEvents = function(marker){
+		//Change marker title
+		google.maps.event.addListener(marker, 'dblclick', function(point){
+			var markerId = point.latLng.lat() + " " + point.latLng.lng();
+
+			var markerNewTitle = window.prompt("Новое название:", marker.title);
+			if(markerNewTitle != marker.title && markerNewTitle != null){
+
+				marker.setTitle(markerNewTitle);
+
+				self.names().forEach(function(oldInfo){
+					if(oldInfo.id == markerId){
+						self.names.replace(oldInfo, 
+						{title : markerNewTitle, id : markerId, description : oldInfo.description});
+					}; 
+				});
+			};
+		});
+		//Remove marker
+		google.maps.event.addListener(marker, 'rightclick', function(point){
+			var markerId = point.latLng.lat() + " " + point.latLng.lng();
+
+			self.names().forEach(function(markerInfo){
+				if(markerInfo.id == markerId){
+					if(confirm("Remove marker " + markerInfo.title + "?")){
+						self.names.remove(function (item){return item.id == markerId});
+						marker.setMap(null);
+					};
+				};
+			});
+		});
+	};
 
 };
 

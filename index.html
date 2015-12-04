@@ -11,8 +11,13 @@
 	<body>
 		<div id = "mapDiv" data-bind = "style:{width:'1200px',height:'760px'}"></div>
 
-		<div id = "infoBox" data-bind = "text : information()">
-		</div>
+		<div id = "infoBox" data-bind = "template : { name: 'namesTmpl', foreach : names }"></div>
+		<script id = "namesTmpl" type = "text/html">
+			
+			<p>Title: <span data-bind = "text : title"></span></p>
+			<p>Description: <span data-bind = "text : description"></span></p>
+			
+		</script>
 		<script src = "js/app.js"></script>
 	</body>
 
