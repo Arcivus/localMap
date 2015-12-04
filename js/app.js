@@ -1,3 +1,17 @@
+ko.bindingHandlers.editableText = {
+    init: function(element, valueAccessor) {
+        $(element).on('blur', function() {
+            var observable = valueAccessor();
+            observable( $(this).text() );
+        });
+
+    },
+    update: function(element, valueAccessor) {
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        $(element).text(value);
+    }
+};
+
 var ViewModel = function(){
 	var self = this;
 	var map;
@@ -9,7 +23,7 @@ var ViewModel = function(){
 	map = new google.maps.Map($('#mapDiv')[0], myOptions);
 
 	var getPlace = function(lat, lng) {
-    return new google.maps.LatLng(lat, lng);
+    	return new google.maps.LatLng(lat, lng);
 	};
 	
 	this.names = ko.observableArray([]);
@@ -23,7 +37,7 @@ var ViewModel = function(){
 			position : getPlace(lat, lng),
 			map : map,
 			title : "Title",
-			description : "description goes here...",
+			description : ko.observable("description goes here..."),
 			id : lat + " " + lng,
 
 		});
@@ -43,10 +57,16 @@ var ViewModel = function(){
 
 				marker.setTitle(markerNewTitle);
 
-				self.names().forEach(function(oldInfo){
+				self.names().forEach(function(oldInfo, i){
 					if(oldInfo.id == markerId){
+
 						self.names.replace(oldInfo, 
 						{title : markerNewTitle, id : markerId, description : oldInfo.description});
+
+						//send clicked marker info to the top of the list
+						var makeFirst = self.names.splice(i, 1);
+						self.names.unshift(makeFirst[0]);
+
 					}; 
 				});
 			};
@@ -54,21 +74,22 @@ var ViewModel = function(){
 		//Remove marker
 		google.maps.event.addListener(marker, 'rightclick', function(point){
 			var markerId = point.latLng.lat() + " " + point.latLng.lng();
-
+			console.log(marker.description());
 			self.names().forEach(function(markerInfo){
 				if(markerInfo.id == markerId){
 					if(confirm("Remove marker " + markerInfo.title + "?")){
+
 						self.names.remove(function (item){return item.id == markerId});
 						marker.setMap(null);
+
 					};
 				};
+
 			});
 		});
 	};
 
 };
-
-
 
 ko.applyBindings(new ViewModel());
 
