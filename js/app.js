@@ -163,7 +163,12 @@ var ViewModel = function(){
 		markers.forEach(function(marker){
 			self.places().forEach(function(place){
 				if(marker.id == place.id){
-					marker.description = place.description();
+					//to solve problem with Knockout observable unwrapping multiple times in the same session
+					if(typeof place.description === "string"){
+						marker.description = place.description;
+					}else{
+						marker.description = place.description();
+					};
 				};
 			});
 		});
