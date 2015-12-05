@@ -1,3 +1,4 @@
+
 ko.bindingHandlers.editableText = {
     init: function(element, valueAccessor) {
         $(element).on('blur', function() {
@@ -24,14 +25,12 @@ var ViewModel = function(){
 	};
 	map = new google.maps.Map($('#mapDiv')[0], myOptions);
 
+
 	var getPlace = function(lat, lng) {
     	return new google.maps.LatLng(lat, lng);
 	};
 	
 	this.places = ko.observableArray([]);
-
-
-
 
 
 	var addMarker = google.maps.event.addListener(map, 'dblclick', function(e){
@@ -50,6 +49,7 @@ var ViewModel = function(){
 		bindMarkerEvents(marker);
 
 		event.preventDefault();
+
 	});
 	
 	var bindMarkerEvents = function(marker){
@@ -68,8 +68,11 @@ var ViewModel = function(){
 						self.places.replace(oldInfo, 
 						{title : markerNewTitle, id : clickedMarkerId, description : oldInfo.description});
 
-
-
+						markers.forEach(function(marker, i){
+							if(marker.id == clickedMarkerId){
+								markers[i].title = markerNewTitle;
+							};
+						});
 					}; 
 				});
 			};
@@ -86,12 +89,9 @@ var ViewModel = function(){
 						marker.setMap(null);
 						markers.forEach(function(marker, i){
 							if(marker.id == clickedMarkerId){
-
 								markers.splice(i, 1);
-
 							};
 						});
-
 					};
 				};
 
@@ -114,10 +114,61 @@ var ViewModel = function(){
 					marker.setIcon('http://maps.google.com/mapfiles/marker_green.png');
 				};
 			});
-		});
+		});		
 	};
 
+	var loadMarkers = function(){
+		var restoredMarkers = JSON.parse(localStorage.getItem("markers"));
+		restoredMarkers.forEach(function(oldmarker, i){
+			var coords = oldmarker.id.split(" ");
+			var lat = parseFloat(coords[0]);
+			var lng = parseFloat(coords[1]);
+			var marker = new google.maps.Marker({
+				position : getPlace(lat, lng),
+				map : map,
+				title : oldmarker.title,
+				description : ko.observable(oldmarker.description),
+				id : lat + " " + lng
+			});
+			markers.push(marker);
+			self.places.push(marker);
+			bindMarkerEvents(marker);
+		})
+
+	};
+	loadMarkers();
+	
+	//search and highlight specific titles
+	$("#searchButton").click(function(){
+
+		var targetOfSearch = $("#searchInput").val().replace(/\s+/g, "").toLowerCase();
+		$("#searchInput").val("");
+
+		markers.forEach(function(marker, i){
+			marker.setIcon('http://mt.googleapis.com/vt/icon/name=icons/spotlight/spotlight-poi.png');
+			if(targetOfSearch != 0 && (markers[i].title.toLowerCase().indexOf(targetOfSearch) > -1)){
+				marker.setIcon('http://maps.google.com/mapfiles/marker_green.png');
+			};
+		});
+
+	});
+
+	$("#saveMarkers").click(function(){
+		markers.forEach(function(marker){
+			self.places().forEach(function(place){
+				if(marker.id == place.id){
+					marker.description = place.description();
+				};
+			});
+		});
+		
+		localStorage["markers"] = JSON.stringify(markers, ['title', 'description', 'id']);
+		console.log(localStorage["markers"]);
+	})
+
 };
+
+
 
 ko.applyBindings(new ViewModel());
 
