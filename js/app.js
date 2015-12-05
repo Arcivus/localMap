@@ -136,8 +136,13 @@ var ViewModel = function(){
 		})
 
 	};
-	loadMarkers();
-	
+	var temp = localStorage.getItem("markers");
+
+	if(localStorage.getItem("markers") != ""){
+		loadMarkers();
+	};
+
+
 	//search and highlight specific titles
 	$("#searchButton").click(function(){
 
@@ -154,6 +159,7 @@ var ViewModel = function(){
 	});
 
 	$("#saveMarkers").click(function(){
+		
 		markers.forEach(function(marker){
 			self.places().forEach(function(place){
 				if(marker.id == place.id){
@@ -164,7 +170,7 @@ var ViewModel = function(){
 		
 		localStorage["markers"] = JSON.stringify(markers, ['title', 'description', 'id']);
 		console.log(localStorage["markers"]);
-	})
+	});
 
 };
 
