@@ -1,0 +1,40 @@
+#mapDiv{
+	float : left;
+	margin-right : 10px;
+	width : 70%;
+	height: 760px;
+}
+.placeInfo{
+	margin-bottom : 5px;
+	background : #EEEEEE;
+	padding : 10px;
+}
+#infoBox{
+	width: 26%;
+	float: left;
+
+}
+body,
+html {
+	margin:0;
+	padding:0;
+	color:#000;
+}
+p{
+	margin:0;
+}
+#searchBar{
+	position: absolute;
+	left: 50%;
+	margin: 50px;
+}
+#searchBarInner{
+	position: relative;
+	left: -50%;
+	border: dotted red 1px;
+}
+#searchBar input[type=text]{
+	width: 300px;
+	font-size: 18px;
+	line-height: 22px;
+}

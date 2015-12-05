@@ -28,7 +28,7 @@ var ViewModel = function(){
     	return new google.maps.LatLng(lat, lng);
 	};
 	
-	this.names = ko.observableArray([]);
+	this.places = ko.observableArray([]);
 
 
 
@@ -46,7 +46,7 @@ var ViewModel = function(){
 
 		});
 		markers.push(marker);
-		self.names.push(marker);
+		self.places.push(marker);
 		bindMarkerEvents(marker);
 
 		event.preventDefault();
@@ -62,10 +62,10 @@ var ViewModel = function(){
 
 				marker.setTitle(markerNewTitle);
 
-				self.names().forEach(function(oldInfo){
+				self.places().forEach(function(oldInfo){
 					if(oldInfo.id == clickedMarkerId){
 
-						self.names.replace(oldInfo, 
+						self.places.replace(oldInfo, 
 						{title : markerNewTitle, id : clickedMarkerId, description : oldInfo.description});
 
 
@@ -77,13 +77,20 @@ var ViewModel = function(){
 		//Remove marker
 		google.maps.event.addListener(marker, 'rightclick', function(point){
 			var clickedMarkerId = point.latLng.lat() + " " + point.latLng.lng();
-			self.names().forEach(function(markerInfo){
+			self.places().forEach(function(markerInfo){
 				if(markerInfo.id == clickedMarkerId){
 
 					if(confirm("Remove marker " + markerInfo.title + "?")){
 
-						self.names.remove(function (item){return item.id == clickedMarkerId});
+						self.places.remove(function (item){return item.id == clickedMarkerId});
 						marker.setMap(null);
+						markers.forEach(function(marker, i){
+							if(marker.id == clickedMarkerId){
+
+								markers.splice(i, 1);
+
+							};
+						});
 
 					};
 				};
@@ -93,11 +100,11 @@ var ViewModel = function(){
 		//Highlight marker
 		google.maps.event.addListener(marker, 'click', function(point){
 			var clickedMarkerId = point.latLng.lat() + " " + point.latLng.lng();
-			self.names().forEach(function(markerInfo, i){
+			self.places().forEach(function(markerInfo, i){
 				if(markerInfo.id == clickedMarkerId){
 					//send clicked marker info to the top of the list
-					var makeFirst = self.names.splice(i, 1);
-					self.names.unshift(makeFirst[0]);
+					var makeFirst = self.places.splice(i, 1);
+					self.places.unshift(makeFirst[0]);
 				};
 			});
 			//set special icon for clicked marker
@@ -105,8 +112,8 @@ var ViewModel = function(){
 				marker.setIcon('http://mt.googleapis.com/vt/icon/name=icons/spotlight/spotlight-poi.png');
 				if(marker.id == clickedMarkerId){
 					marker.setIcon('http://maps.google.com/mapfiles/marker_green.png');
-				}
-			})
+				};
+			});
 		});
 	};
 
