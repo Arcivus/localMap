@@ -40,9 +40,9 @@ var ViewModel = function(){
 			position : getPlace(lat, lng),
 			map : map,
 			title : "Title",
-			description : ko.observable("description goes here..."),
+			description : ko.observable("Click to add description."),
 			id : lat + " " + lng,
-
+			imagePath : "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=" + lat + ", " + lng
 		});
 		markers.push(marker);
 		self.places.push(marker);
@@ -66,7 +66,7 @@ var ViewModel = function(){
 					if(oldInfo.id == clickedMarkerId){
 
 						self.places.replace(oldInfo, 
-						{title : markerNewTitle, id : clickedMarkerId, description : oldInfo.description});
+						{title : markerNewTitle, id : clickedMarkerId, description : oldInfo.description, imagePath : oldInfo.imagePath});
 
 						markers.forEach(function(marker, i){
 							if(marker.id == clickedMarkerId){
@@ -128,7 +128,8 @@ var ViewModel = function(){
 				map : map,
 				title : oldmarker.title,
 				description : ko.observable(oldmarker.description),
-				id : lat + " " + lng
+				id : lat + " " + lng,
+				imagePath : "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=" + lat + ", " + lng
 			});
 			markers.push(marker);
 			self.places.push(marker);
@@ -138,25 +139,35 @@ var ViewModel = function(){
 	};
 	var temp = localStorage.getItem("markers");
 
-	if(localStorage.getItem("markers") != ""){
+	if(typeof temp !== 'undefined' && temp !== null ){
 		loadMarkers();
 	};
 
 
 	//search and highlight specific titles
-	$("#searchButton").click(function(){
+
+	var searchMarker = function(){
 
 		var targetOfSearch = $("#searchInput").val().replace(/\s+/g, "").toLowerCase();
 		$("#searchInput").val("");
 
 		markers.forEach(function(marker, i){
 			marker.setIcon('http://mt.googleapis.com/vt/icon/name=icons/spotlight/spotlight-poi.png');
-			if(targetOfSearch != 0 && (markers[i].title.toLowerCase().indexOf(targetOfSearch) > -1)){
+			if(targetOfSearch != "" && (markers[i].title.toLowerCase().indexOf(targetOfSearch) > -1)){
 				marker.setIcon('http://maps.google.com/mapfiles/marker_green.png');
 			};
 		});
 
+	};
+
+	$("#searchButton").click(searchMarker);
+	$("#searchBarInner").keyup(function(e){
+		if(e.keyCode == 13){
+			searchMarker();
+		}
 	});
+
+	//save added markers
 
 	$("#saveMarkers").click(function(){
 		
@@ -174,7 +185,6 @@ var ViewModel = function(){
 		});
 		
 		localStorage["markers"] = JSON.stringify(markers, ['title', 'description', 'id']);
-		console.log(localStorage["markers"]);
 	});
 
 };

@@ -2,17 +2,19 @@
 	float: left;
 	margin-right: 10px;
 	width: 70%;
-	height: 760px;
+	height: 900px;
 }
 .placeInfo{
 	margin-bottom : 5px;
 	background : #EEEEEE;
 	padding: 10px;
+
 }
 #infoBox{
-	width: 26%;
+	width: 29%;
 	float: left;
-
+	max-height: 833px;
+	overflow: auto;
 }
 body,
 html {
@@ -27,8 +29,10 @@ p{
 	position: absolute;
 	left: 50%;
 	margin: 50px;
+
 }
 #searchBarInner{
+
 	position: relative;
 	left: -50%;
 }
@@ -36,15 +40,22 @@ p{
 	width: 300px;
 	font-size: 18px;
 	line-height: 22px;
+	padding-left: 5px;
+	vertical-align: middle;
 }
 #searchButton {
-	outline: none ;
-	background-color: transparent;
-	background-image: url(img/search-button.png);
-    background-repeat: no-repeat;
-    border: none;
     cursor: pointer; 
-    height: 32px;        
-    padding-left: 20px;   
-    vertical-align: middle; 
+    height: 28px;        
+    vertical-align: middle;
+}
+#markersHead{
+	width: 20%;
+	float: left;
+	padding-left: 5px;
+}
+#saveMarkers{
+	float: left;
+	margin-top: 20px;
+	height: 30px;
+	font-size: 16px;
 }
