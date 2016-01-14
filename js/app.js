@@ -19,6 +19,7 @@ var ViewModel = function(){
 	var self = this;
 	var map;
 	var myOptions = {
+		disableDoubleClickZoom: true,
     	zoom: 17,
     	center: new google.maps.LatLng(59.957369, 30.307766),
     	mapTypeId: 'roadmap'
@@ -31,7 +32,6 @@ var ViewModel = function(){
 	};
 	
 	this.places = ko.observableArray([]);
-
 
 	var addMarker = google.maps.event.addListener(map, 'dblclick', function(e){
 		var lat = e.latLng.lat();
@@ -48,7 +48,7 @@ var ViewModel = function(){
 		self.places.push(marker);
 		bindMarkerEvents(marker);
 
-		event.preventDefault();
+
 
 	});
 	
